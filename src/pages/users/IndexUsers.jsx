@@ -207,6 +207,11 @@ export default function UsersPage() {
                   Edit
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to={`/users/show/${user.id}`} className="cursor-pointer">
+                  Detail
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-red-600 cursor-pointer"
                 onClick={() => {

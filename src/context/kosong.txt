@@ -1,0 +1,57 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { saveUsers } from './localStorage'
+
+export const fetchUsers = createAsyncThunk(
+  'users/fetchUsers',
+  async () => {
+    const response = await fetch('https://jsonplaceholder.typicode.com/users')
+    return await response.json()
+  }
+)
+
+const userSlice = createSlice({
+  name: 'users',
+  initialState: {
+    list: [],        // Menyimpan daftar user
+    status: 'idle',  // idle, loading, succeeded, failed
+    error: null
+  },
+  reducers: {
+    addUser: (state, action) => {
+      const newUser = action.payload
+      newUser.id = state.list.length + 1
+      state.list.push(newUser)
+      saveUsers(state.list) // Simpan ke localStorage
+    },
+    updateUser: (state, action) => {
+      const updatedUser = action.payload
+      const index = state.list.findIndex(u => u.id === updatedUser.id)
+      if (index !== -1) {
+        state.list[index] = updatedUser
+        saveUsers(state.list) // Simpan ke localStorage
+      }
+    },
+    deleteUser: (state, action) => {
+      state.list = state.list.filter(u => u.id !== action.payload)
+      saveUsers(state.list) // Simpan ke localStorage
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsers.pending, (state) => {
+        state.status = 'loading'
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.list = action.payload
+        saveUsers(state.list) // Simpan ke localStorage saat pertama fetch
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message
+      })
+  }
+})
+
+export const { addUser, updateUser, deleteUser } = userSlice.actions
+export default userSlice.reducer

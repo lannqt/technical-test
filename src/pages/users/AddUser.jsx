@@ -17,7 +17,7 @@ const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Please enter a valid email"),
-  phone: z.string().min(6, "Phone number too short").optional(),
+  phone: z.string().min(6, "Phone number too short").or(z.literal("")).optional(),
   website: z.string().url("Please enter a valid URL").or(z.literal("")).optional(),
   address: z.object({
     street: z.string().min(2, "Street too short"),
@@ -25,8 +25,8 @@ const formSchema = z.object({
     city: z.string().min(2, "City too short"),
     zipcode: z.string().min(3, "Zip code too short"),
     geo: z.object({
-      lat: z.string().regex(/^-?\d+(\.\d+)?$/, "Invalid latitude"),
-      lng: z.string().regex(/^-?\d+(\.\d+)?$/, "Invalid longitude"),
+      lat: z.string().regex(/^-?\d+(\.\d+)?$/, "Invalid latitude").or(z.literal("")).optional(),
+      lng: z.string().regex(/^-?\d+(\.\d+)?$/, "Invalid longitude").or(z.literal("")).optional(),
     }).optional(),
   }),
   company: z.object({
@@ -98,7 +98,6 @@ export default function AddUser() {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid gap-6 md:grid-cols-2">
-                  {/* Personal Information */}
                   <div className="space-y-4">
                     <h3 className="flex items-center gap-2 font-medium text-sm">
                       <User className="h-4 w-4" />
@@ -136,13 +135,13 @@ export default function AddUser() {
                     <FormField
                       control={form.control}
                       name="email"
-                      render={({ field }) => (
+                      render={({ field, fieldState }) => (
                         <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
                             <div className="relative">
                               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                              <Input placeholder="email@example.com" className="pl-10" {...field} />
+                              <Input placeholder="email@example.com"  className={`pl-10 ${fieldState.error && 'border-red-500'}`} {...field} />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -185,7 +184,6 @@ export default function AddUser() {
                     />
                   </div>
 
-                  {/* Address Information */}
                   <div className="space-y-4">
                     <h3 className="flex items-center gap-2 font-medium text-sm">
                       <MapPin className="h-4 w-4" />
@@ -278,7 +276,6 @@ export default function AddUser() {
                     </div>
                   </div>
 
-                  {/* Company Information */}
                   <div className="space-y-4 md:col-span-2">
                     <h3 className="flex items-center gap-2 font-medium text-sm">
                       <Briefcase className="h-4 w-4" />

@@ -28,8 +28,14 @@ npm install
 ```bash
 npm run dev
 ```
+
 4. Open in your browser:
 ```bash
 http://localhost:5173
 ```
 
+5. Login:
+```bash
+username: admin
+password: admin123
+```
